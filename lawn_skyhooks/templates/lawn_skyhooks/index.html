@@ -14,7 +14,6 @@
             <th>Skyhook</th>
             <th>Reagent</th>
             <th data-bs-toggle="tooltip" title="The total esimated for both the Secure and Surplass bays. Does not account for theft.">Estimated Amount</th>
-            <th>Owner</th>
             <th>Actions</th>
         </tr>
         </thead>
@@ -24,7 +23,6 @@
             <td>{{ sh.location }}</td>
             <td>{{ sh.resource_type|capfirst }}</td>
             <td>{{ sh.estimate_current_quantity|floatformat:0 }}</td>
-            <td>{{ sh.user }}</td>
             <td>
                 <!-- Empty button triggers modal -->
                 <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#emptyModal{{ sh.id }}">

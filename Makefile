@@ -1,5 +1,7 @@
-# Makefile for AA Base Plugin
-
+# Makefile for LAWN Skyhooks
+# Specify the shell to be used for executing the commands in this Makefile.
+# In this case, it is set to /bin/bash.
+SHELL := /bin/bash
 # Variables
 appname = lawn-skyhooks
 appname_verbose = LAWN Skyhooks
@@ -57,6 +59,8 @@ graph_models:
 prepare-release: pot
 	@echo ""
 	@echo "Preparing a release …"
+	@current_version=$$(grep -Po '(?<=__version__ = ")[^"]*' $(package)/__init__.py); \
+	echo "Current version is: $$current_version";
 	@read -p "New Version Number: " new_version; \
 	sed -i "/__version__ = /c\__version__ = \"$$new_version\"" $(package)/__init__.py; \
 	echo "Updated version in $(TEXT_BOLD)$(package)/__init__.py$(TEXT_BOLD_END)"; \

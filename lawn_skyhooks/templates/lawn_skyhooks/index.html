@@ -30,7 +30,7 @@
                 <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#emptyModal{{ sh.id }}">
                     Empty
                 </button>
-                {% if request.user.has_perm('lawn_skyhooks.view_skyhook_logs') %}
+                {% if perms.lawn_skyhooks.view_skyhook_logs%}
                     <!-- View Log button triggers modal -->
                     <button type="button" class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#logModal{{ sh.id }}">
                         View Log

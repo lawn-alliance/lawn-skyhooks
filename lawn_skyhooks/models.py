@@ -73,6 +73,9 @@ class EmptyLog(models.Model):
     skyhook = models.ForeignKey(Skyhook, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.SET(get_sentinel_user), null=True)
     emptied_at = models.DateTimeField(auto_now_add=True)
+    amount_taken = models.FloatField(
+        default=0.0, help_text="Amount removed from the Skyhook"
+    )
 
     def __str__(self):
-        return f"{self.skyhook.name} emptied by {self.user} on {self.emptied_at}"
+        return f"{self.skyhook.location} emptied by {self.user} on {self.emptied_at} ({self.amount_taken})"

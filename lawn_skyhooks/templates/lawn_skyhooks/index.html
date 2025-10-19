@@ -14,6 +14,7 @@
             <th>Skyhook</th>
             <th>Reagent</th>
             <th data-bs-toggle="tooltip" title="The total esimated for both the Secure and Surplass bays. Does not account for theft.">Estimated Amount</th>
+            <th>Owner</th>
             <th>Actions</th>
         </tr>
         </thead>
@@ -23,11 +24,78 @@
             <td>{{ sh.location }}</td>
             <td>{{ sh.resource_type|capfirst }}</td>
             <td>{{ sh.estimate_current_quantity|floatformat:0 }}</td>
+            <td>{{ sh.user }}</td>
             <td>
-            <form method="post" action="{% url 'lawn_skyhooks:empty_skyhook' sh.id %}" class="d-inline">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-sm btn-primary">Empty</button>
-            </form>
+                <!-- Empty button triggers modal -->
+                <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#emptyModal{{ sh.id }}">
+                    Empty
+                </button>
+
+                <!-- View Log button triggers modal -->
+                <button type="button" class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#logModal{{ sh.id }}">
+                    View Log
+                </button>
+
+                <!-- Empty Modal -->
+                <div class="modal fade" id="emptyModal{{ sh.id }}" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content bg-dark text-white">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Empty {{ sh.location }}</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                    <form method="post" action="{% url 'lawn_skyhooks:empty_skyhook' sh.id %}">
+                        {% csrf_token %}
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label for="amount{{ sh.id }}" class="form-label">Amount Taken</label>
+                                <input type="number" step="0.01" name="amount_taken" id="amount{{ sh.id }}" class="form-control" required>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Confirm</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        </div>
+                    </form>
+                    </div>
+                </div>
+                </div>
+
+                <!-- Log Modal -->
+                <div class="modal fade" id="logModal{{ sh.id }}" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content bg-dark text-white">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Empty Log - {{ sh.location }}</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <table class="table table-striped table-dark">
+                        <thead>
+                            <tr>
+                            <th>User</th>
+                            <th>Amount Taken</th>
+                            <th>Time</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for log in sh.emptylog_set.all|dictsortreversed:"emptied_at" %}
+                            <tr>
+                            <td>{{ log.user }}</td>
+                            <td>{{ log.amount_taken|floatformat:2 }}</td>
+                            <td>{{ log.emptied_at|naturaltime }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                            <td colspan="3">No logs yet.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                        </table>
+                    </div>
+                    </div>
+                </div>
+                </div>
             </td>
         </tr>
         {% endfor %}

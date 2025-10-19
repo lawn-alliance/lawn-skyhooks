@@ -1,8 +1,24 @@
 # Make targets for Django projects
 
+# List of languages to create translation files for
+django_locales = \
+	--locale cs_CZ \
+	--locale de \
+	--locale es \
+	--locale fr_FR \
+	--locale it_IT \
+	--locale ja \
+	--locale ko_KR \
+	--locale nl_NL \
+	--locale pl_PL \
+	--locale ru \
+	--locale sk \
+	--locale uk \
+	--locale zh_Hans
+
 # Create or update translation template (.pot file)
 .PHONY: pot
-pot:
+pot: check-python-venv
 	@echo "Creating or updating .pot file …"
 	@django-admin makemessages \
 		--locale en \
@@ -17,7 +33,7 @@ pot:
 
 # Add a new translation
 .PHONY: add_translation
-add_translation:
+add_translation: check-python-venv
 	@echo "Adding a new translation"
 	@read -p "Enter the language code (e.g. 'en_GB'): " language_code; \
 	django-admin makemessages \
@@ -37,22 +53,9 @@ add_translation:
 
 # Translation files
 .PHONY: translations
-translations:
+translations: check-python-venv
 	@echo "Creating or updating translation files"
-	@django-admin makemessages \
-		--locale cs_CZ \
-		--locale de \
-		--locale es \
-		--locale fr_FR \
-		--locale it_IT \
-		--locale ja \
-		--locale ko_KR \
-		--locale nl_NL \
-		--locale pl_PL \
-		--locale ru \
-		--locale sk \
-		--locale uk \
-		--locale zh_Hans \
+	@django-admin makemessages $(django_locales) \
 		--keep-pot \
 		--ignore 'build/*' \
 		--ignore 'node_modules/*' \
@@ -75,32 +78,19 @@ translations:
 
 # Compile translation files
 .PHONY: compile_translations
-compile_translations:
+compile_translations: check-python-venv
 	@echo "Compiling translation files"
-	@django-admin compilemessages \
-		--locale cs_CZ \
-		--locale de \
-		--locale es \
-		--locale fr_FR \
-		--locale it_IT \
-		--locale ja \
-		--locale ko_KR \
-		--locale nl_NL \
-		--locale pl_PL \
-		--locale ru \
-		--locale sk \
-		--locale uk \
-		--locale zh_Hans
+	@django-admin compilemessages $(django_locales)
 
 # Migrate all database changes
 .PHONY: migrate
-migrate:
+migrate: check-python-venv
 	@echo "Migrating the database"
 	@python ../myauth/manage.py migrate $(package)
 
 # Make migrations for the app
 .PHONY: migrations
-migrations:
+migrations: check-python-venv
 	@echo "Creating or updating migrations"
 	@python ../myauth/manage.py makemigrations $(package)
 
@@ -109,12 +99,12 @@ migrations:
 help::
 	@echo "  $(TEXT_UNDERLINE)Django:$(TEXT_UNDERLINE_END)"
 	@echo "    Migration handling:"
-	@echo "      migrate                 Migrate all database changes"
-	@echo "      migrations              Create or update migrations"
+	@echo "      migrate                   Migrate all database changes"
+	@echo "      migrations                Create or update migrations"
 	@echo ""
 	@echo "    Translation handling:"
-	@echo "      add_translation         Add a new translation"
-	@echo "      compile_translations    Compile translation files"
-	@echo "      pot                     Create or update translation template (.pot file)"
-	@echo "      translations            Create or update translation files"
+	@echo "      add_translation           Add a new translation"
+	@echo "      compile_translations      Compile translation files"
+	@echo "      pot                       Create or update translation template (.pot file)"
+	@echo "      translations              Create or update translation files"
 	@echo ""

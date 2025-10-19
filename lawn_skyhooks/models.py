@@ -17,7 +17,10 @@ class LawnSkyhooks(models.Model):
 
         managed = False
         default_permissions = ()
-        permissions = (("basic_access", "Can access this app"),)
+        permissions = (
+            ("basic_access", "Can access this app"),
+            ("view_skyhook_logs", "Can view skyhook logs"),
+        )
 
 
 class Skyhook(models.Model):

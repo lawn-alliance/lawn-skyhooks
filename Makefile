@@ -2,16 +2,24 @@
 
 # Variables
 appname = lawn-skyhooks
-appname_verbose = AA Base Plugin
+appname_verbose = LAWN Skyhooks
 package = lawn_skyhooks
 translation_directory = $(package)/locale
 translation_template = $(translation_directory)/django.pot
 translation_file_relative_path = LC_MESSAGES/django.po
-git_repository = https://github.com/lawn-alliance/$(appname)
+git_repository = https://github.com/astrum-mechanica/$(appname)
 git_repository_issues = $(git_repository)/issues
 
 # Default goal
 .DEFAULT_GOAL := help
+
+# Check if Python virtual environment is active
+.PHONY: check-python-venv
+check-python-venv:
+	@if [ -z "$(VIRTUAL_ENV)" ]; then \
+		echo "$(TEXT_COLOR_RED)$(TEXT_BOLD)Python virtual environment is NOT active!$(TEXT_RESET)" ; \
+		exit 1; \
+	fi
 
 # Confirm action
 .PHONY: confirm-action
@@ -46,25 +54,34 @@ graph_models:
 # Prepare a new release
 # Update the graph of the models, translation files and the version in the package
 .PHONY: prepare-release
-prepare-release: graph_models pot
+prepare-release: pot
 	@echo ""
 	@echo "Preparing a release …"
 	@read -p "New Version Number: " new_version; \
-	sed -i "/__version__/c\__version__ = \"$$new_version\"" $(package)/__init__.py; \
-	sed -i "/\"Project-Id-Version: /c\\\"Project-Id-Version: $(appname_verbose) $$new_version\\\n\"" $(translation_template); \
-	sed -i "/\"Report-Msgid-Bugs-To: /c\\\"Report-Msgid-Bugs-To: $(git_repository_issues)\\\n\"" $(translation_template); \
-#	subdircount=$$(find $(translation_directory) -mindepth 1 -maxdepth 1 -type d | wc -l); \
-#	if [[ $$subdircount -gt 1 ]]; then \
-#		for path in $(translation_directory)/*/; do \
-#			[ -d "$$path/LC_MESSAGES" ] || continue; \
-#			if [[ -f "$$path/$(translation_file_relative_path)" ]] \
-#				then \
-#					sed -i "/\"Project-Id-Version: /c\\\"Project-Id-Version: $(appname_verbose) $$new_version\\\n\"" $$path/$(translation_file_relative_path); \
-#					sed -i "/\"Report-Msgid-Bugs-To: /c\\\"Report-Msgid-Bugs-To: $(git_repository_issues)\\\n\"" $$path/$(translation_file_relative_path); \
-#			fi; \
-#		done; \
-#	fi;
-	echo "Updated version in $(TEXT_BOLD)$(package)/__init__.py$(TEXT_BOLD_END)"
+	sed -i "/__version__ = /c\__version__ = \"$$new_version\"" $(package)/__init__.py; \
+	echo "Updated version in $(TEXT_BOLD)$(package)/__init__.py$(TEXT_BOLD_END)"; \
+	if [[ $$new_version =~ (alpha|beta) ]] \
+		then \
+			echo "$(TEXT_COLOR_RED)$(TEXT_BOLD)Pre-release$(TEXT_RESET) version detected!"; \
+			git restore $(translation_directory)/django.pot; \
+	else \
+		echo "$(TEXT_BOLD)Release$(TEXT_BOLD_END) version detected."; \
+		sed -i -E "/$(appname)==/s/==.*/==$$new_version/" README.md; \
+		echo "Updated version in $(TEXT_BOLD)README.md$(TEXT_BOLD_END)"; \
+		sed -i "/\"Project-Id-Version: /c\\\"Project-Id-Version: $(appname_verbose) $$new_version\\\n\"" $(translation_template); \
+		sed -i "/\"Report-Msgid-Bugs-To: /c\\\"Report-Msgid-Bugs-To: $(git_repository_issues)\\\n\"" $(translation_template); \
+#		subdircount=$$(find $(translation_directory) -mindepth 1 -maxdepth 1 -type d | wc -l); \
+#		if [[ $$subdircount -gt 1 ]]; then \
+#			for path in $(translation_directory)/*/; do \
+#				[ -d "$$path/LC_MESSAGES" ] || continue; \
+#				if [[ -f "$$path/$(translation_file_relative_path)" ]] \
+#					then \
+#						sed -i "/\"Project-Id-Version: /c\\\"Project-Id-Version: $(appname_verbose) $$new_version\\\n\"" $$path/$(translation_file_relative_path); \
+#						sed -i "/\"Report-Msgid-Bugs-To: /c\\\"Report-Msgid-Bugs-To: $(git_repository_issues)\\\n\"" $$path/$(translation_file_relative_path); \
+#				fi; \
+#			done; \
+#		fi; \
+	fi;
 
 # Help
 .PHONY: help
@@ -77,10 +94,10 @@ help::
 	@echo ""
 	@echo "$(TEXT_BOLD)Commands:$(TEXT_BOLD_END)"
 	@echo "  $(TEXT_UNDERLINE)General:$(TEXT_UNDERLINE_END)"
-	@echo "    graph_models              Create a graph of the models"
-	@echo "    help                      Show this help message"
-	@echo "    prepare-release           Prepare a release and update the version in '$(package)/__init__.py'."
-	@echo "                              Please make sure to update the 'CHANGELOG.md' file accordingly."
+	@echo "    graph_models                Create a graph of the models"
+	@echo "    help                        Show this help message"
+	@echo "    prepare-release             Prepare a release and update the version in '$(package)/__init__.py'."
+	@echo "                                Please make sure to update the 'CHANGELOG.md' file accordingly."
 	@echo ""
 
 # Include the configurations

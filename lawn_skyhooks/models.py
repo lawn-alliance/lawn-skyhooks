@@ -20,51 +20,105 @@ class LawnSkyhooks(models.Model):
         permissions = (
             ("basic_access", "Can access this app"),
             ("view_skyhook_logs", "Can view skyhook logs"),
+            ("import_skyhooks", "Can import skyhook data"),
         )
 
 
 class Skyhook(models.Model):
-    """A Skyhook is a location where resources accumulate."""
+    """
+    Skyhook model
+    """
 
-    # Define allowed choices for resource type
     RESOURCE_TYPE_CHOICES = [
         ("magmatic gas", "Magmatic Gas"),
         ("superionic ice", "Superionic Ice"),
     ]
 
-    # Each location should be unique
     location = models.CharField(
         max_length=255,
-        unique=True,  # ensures uniqueness
-        help_text="Name or system of the Skyhook's location.",
+        unique=True,
+        help_text="Name of the Skyhook location e.g. 'BZ-BCK III'.",
     )
-
     resource_type = models.CharField(
         max_length=50,
         choices=RESOURCE_TYPE_CHOICES,
-        help_text="Type of resource this Skyhook accumulates.",
+    )
+    resource_per_minute = models.FloatField(default=0.0)
+    last_emptied_at = models.DateTimeField(null=True, blank=True)
+    next_vulnerable_at = models.DateTimeField(null=True, blank=True)
+    claimed_by = models.ForeignKey(
+        User,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="claimed_skyhooks",
+        help_text="User currently working on emptying this skyhook.",
     )
 
-    resource_per_minute = models.FloatField(
-        default=0.0, help_text="Accumulation rate of the resource per minute."
-    )
-
-    last_emptied_at = models.DateTimeField(
-        null=True, blank=True, help_text="Timestamp when this Skyhook was last emptied."
+    claimed_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text="When the skyhook was claimed.",
     )
 
     def estimate_current_quantity(self):
         """
-        Calculates how much resource has accumulated
-        since the last time it was emptied.
-        """
-        # Django
+        returns estimate of items in skyhook
 
+        :param self:
+        """
         if self.last_emptied_at is None:
             return 0.0
-
         delta_minutes = (timezone.now() - self.last_emptied_at).total_seconds() / 60
         return delta_minutes * self.resource_per_minute
+
+    def time_until_vulnerable(self):
+        """
+        time until skyhook is vulnerable
+
+        :param self: Description
+        """
+        if self.next_vulnerable_at is None:
+            return None
+        delta = self.next_vulnerable_at - timezone.now()
+        return delta if delta.total_seconds() > 0 else None
+
+    def claim(self, user):
+        """
+        claim skyhook
+
+        :param self: Description
+        :param user: Description
+        """
+        self.claimed_by = user
+        self.claimed_at = timezone.now()
+        self.save()
+
+    def empty(self, user, amount_taken=0.0):
+        """
+        empty skyhook
+
+        :param self: Description
+        :param user: Description
+        :param amount_taken: Description
+        """
+        self.last_emptied_at = timezone.now()
+        self.claimed_by = None
+        self.claimed_at = None
+        self.save()
+        EmptyLog.objects.create(
+            skyhook=self,
+            user=user,
+            amount_taken=amount_taken,
+        )
+
+    def is_claimed(self):
+        """
+        is skyhook claimed
+
+        :param self: Description
+        """
+        return self.claimed_by is not None
 
     def __str__(self):
         return f"{self.location} ({self.resource_type})"
@@ -82,3 +136,18 @@ class EmptyLog(models.Model):
 
     def __str__(self):
         return f"{self.skyhook.location} emptied by {self.user} on {self.emptied_at} ({self.amount_taken})"
+
+
+class VulnerableLog(models.Model):
+    """
+    Vulnerable time log
+    """
+
+    skyhook = models.ForeignKey(
+        Skyhook, on_delete=models.CASCADE, related_name="vulnerable_logs"
+    )
+    next_vulnerable_at = models.DateTimeField()
+    logged_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.skyhook.location} - {self.next_vulnerable_at}"

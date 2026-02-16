@@ -121,7 +121,7 @@ repos:
         description: Ensure that files end with a newline.
 
   - repo: https://github.com/eslint/eslint
-    rev: c54c9cc9df001013d425151ea48dd6b18fa6c5ee  # frozen: v10.0.0-rc.2
+    rev: 6580199025a8ef67c525c95eada27f23c940db12  # frozen: v10.0.0
     hooks:
       - id: eslint
         name: ESLint
@@ -133,7 +133,7 @@ repos:
           - globals@16.3.0  # https://github.com/sindresorhus/globals/releases/latest
 
   - repo: https://github.com/thibaudcolas/pre-commit-stylelint
-    rev: 05fae982df4a486b2a8e8f1d0e6ff6817f230957  # frozen: v17.1.0
+    rev: 89f50b9c82a9b4fbdd64da606c25956f2c18cc4a  # frozen: v17.2.0
     hooks:
       - id: stylelint
         name: Stylelint
@@ -254,8 +254,8 @@ repos:
         name: Mdformat
         description: Format Markdown files.
         additional_dependencies:
-          - mdformat-gfm==0.4.1  # Mdformat plugin for GitHub Flavored Markdown compatibility » https://github.com/hukkin/mdformat-gfm/tags
-          - mdformat-toc==0.3.0  # Mdformat plugin to generate a table of contents » https://github.com/hukkin/mdformat-toc/tags
+          - mdformat-gfm==1.0.0  # Mdformat plugin for GitHub Flavored Markdown compatibility » https://github.com/hukkin/mdformat-gfm/tags
+          - mdformat-toc==0.5.0  # Mdformat plugin to generate a table of contents » https://github.com/hukkin/mdformat-toc/tags
           - mdformat-black==0.1.1  # Mdformat plugin to Blacken Python code blocks » https://github.com/hukkin/mdformat-black/tags
           - mdformat-shfmt==0.2.0  # Mdformat plugin to format shell code blocks » https://github.com/hukkin/mdformat-shfmt/tags
 
@@ -267,7 +267,7 @@ repos:
         description: Format the tox.ini file.
 
   - repo: https://github.com/tox-dev/pyproject-fmt
-    rev: 2a892e1706c9e0e1f853be3f34a9e04f0d5c86d9  # frozen: v2.12.1
+    rev: 662a9f8c81ba2eb5222b17c6707193907713a0a1  # frozen: v2.16.0
     hooks:
       - id: pyproject-fmt
         name: pyproject.toml formatter

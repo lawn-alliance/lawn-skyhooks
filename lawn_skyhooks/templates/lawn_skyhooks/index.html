@@ -2,6 +2,7 @@
 {% load i18n %}
 {% load humanize %}
 {% load static %}
+{% load skyhooks %}
 
 {% block details %}
 
@@ -13,7 +14,9 @@
         <tr>
             <th>Skyhook</th>
             <th>Reagent</th>
-            <th data-bs-toggle="tooltip" title="The total esimated for both the Secure and Surplass bays. Does not account for theft.">Estimated Amount</th>
+            <th data-bs-toggle="tooltip" title="The total estimated for both the Secure and Surplass bays. Does not account for theft.">Estimated Amount</th>
+            <th>Vulnerability Date</th>
+            <th> Time until Vulnerability</th>
             <th>Actions</th>
         </tr>
         </thead>
@@ -23,12 +26,22 @@
             <td>{{ sh.location }}</td>
             <td>{{ sh.resource_type|capfirst }}</td>
             <td>{{ sh.estimate_current_quantity|floatformat:0 }}</td>
+            <td>{{ sh.next_vulnerable_at}}</td>
+            <td>{{ sh.time_until_vulnerable|format_timedelta }}</td>
             <td>
                 <!-- Empty button triggers modal -->
-                <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#emptyModal{{ sh.id }}">
-                    Empty
-                </button>
-                {% if perms.lawn_skyhooks.view_skyhook_logs%}
+                {% if sh.claimed_by == request.user %}
+                    <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#emptyModal{{ sh.id }}">
+                        Empty
+                    </button>
+                {% endif %}
+                {% if not sh.claimed_by %}
+                    <form method="post" action="{% url 'lawn_skyhooks:claim_skyhook' sh.pk %}" class="d-inline">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-sm btn-primary">Claim</button>
+                    </form>
+                {% endif %}
+                {% if perms.lawn_skyhooks.view_skyhook_logs %}
                     <!-- View Log button triggers modal -->
                     <button type="button" class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#logModal{{ sh.id }}">
                         View Log
@@ -108,10 +121,10 @@
     $(document).ready(function () {
         $('#skyhook-table').DataTable({
             pageLength: 25,
-            order: [[2, 'desc']], // optional default sort
+            order: [[4, 'asc']], // optional default sort
             columnDefs: [
                 {
-                    targets: [3], // zero-based index of the Actions column
+                    targets: [5], // zero-based index of the Actions column
                     orderable: false
                 }
             ]

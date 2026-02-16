@@ -4,9 +4,9 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
 from django.shortcuts import get_object_or_404, redirect, render
-from django.utils import timezone
 
-from .models import EmptyLog, Skyhook
+from .models import Skyhook
+from .tasks import process_skyhook_data
 
 
 @login_required
@@ -31,7 +31,12 @@ def index(request):
 @login_required
 @permission_required("lawn_skyhooks.basic_access")
 def empty_skyhook(request, pk):
-    """Empty a Skyhook, recording the amount and user."""
+    """
+    Docstring for empty_skyhook
+
+    :param request: Description
+    :param pk: Description
+    """
     skyhook = get_object_or_404(Skyhook, id=pk)
 
     if request.method == "POST":
@@ -41,16 +46,40 @@ def empty_skyhook(request, pk):
             messages.error(request, "Invalid amount entered.")
             return redirect("lawn_skyhooks:index")
 
-        # Update last_emptied_at
-        skyhook.last_emptied_at = timezone.now()
-        skyhook.save()
-
-        # Record in log
-        EmptyLog.objects.create(
-            skyhook=skyhook, user=request.user, amount_taken=amount_taken
-        )
-
+        skyhook.empty(request.user, amount_taken)
         messages.success(request, f"{skyhook.location} emptied successfully!")
         return redirect("lawn_skyhooks:index")
 
     return redirect("lawn_skyhooks:index")
+
+
+@login_required
+@permission_required("lawn_skyhooks.basic_access")
+def claim_skyhook(request, pk):
+    """
+    Docstring for claim_skyhook
+
+    :param request: Description
+    :param pk: Description
+    """
+    skyhook = get_object_or_404(Skyhook, id=pk)
+
+    if request.method == "POST":
+        skyhook.claim(request.user)
+        messages.success(request, f"{skyhook.location} claimed!")
+        return redirect("lawn_skyhooks:index")
+
+    return redirect("lawn_skyhooks:index")
+
+
+@login_required
+@permission_required("lawn_skyhooks.basic_access")
+def import_data(request):
+    """Render import view and handle data submission."""
+    if request.method == "POST":
+        raw_data = request.POST.get("raw_data", "")
+        process_skyhook_data.delay(raw_data)
+        messages.success(request, "Data sent for processing!")
+        return redirect("lawn_skyhooks:index")
+
+    return render(request, "lawn_skyhooks/import.html")

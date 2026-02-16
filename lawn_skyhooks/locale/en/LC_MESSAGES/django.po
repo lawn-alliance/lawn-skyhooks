@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-10-19 12:14-0400\n"
+"POT-Creation-Date: 2026-02-15 22:39-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,13 +17,13 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
 #: lawn_skyhooks/__init__.py:7
 #: lawn_skyhooks/templates/lawn_skyhooks/base.html:6
 #: lawn_skyhooks/templates/lawn_skyhooks/base.html:10
 msgid "LAWN Skyhooks"
 msgstr ""
 
-#: lawn_skyhooks/apps.py:12
-#, python-brace-format
-msgid "LAWN Skyhooks v{__version__}"
+#: lawn_skyhooks/templates/lawn_skyhooks/base.html:18
+msgid "Import Data"
 msgstr ""

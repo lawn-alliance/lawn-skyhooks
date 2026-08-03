@@ -121,7 +121,7 @@ repos:
         description: Ensure that files end with a newline.
 
   - repo: https://github.com/eslint/eslint
-    rev: 6580199025a8ef67c525c95eada27f23c940db12  # frozen: v10.0.0
+    rev: 196da3cb47b07f27d6c633cf8901fe52112a640f  # frozen: v10.8.0
     hooks:
       - id: eslint
         name: ESLint
@@ -133,7 +133,7 @@ repos:
           - globals@16.3.0  # https://github.com/sindresorhus/globals/releases/latest
 
   - repo: https://github.com/thibaudcolas/pre-commit-stylelint
-    rev: 89f50b9c82a9b4fbdd64da606c25956f2c18cc4a  # frozen: v17.2.0
+    rev: c04e74b560392d1602e683cfacff9ad134738f49  # frozen: v17.14.1
     hooks:
       - id: stylelint
         name: Stylelint
@@ -174,14 +174,14 @@ repos:
         description: Enforce that python3.6+ type annotations are used instead of type comments.
 
   - repo: https://github.com/editorconfig-checker/editorconfig-checker.python
-    rev: 11ea70506fd878d26129b2b87746fd1a1f6b561b  # frozen: 3.6.0
+    rev: 3aa28ce11a84d747c5695ad10b81945f2400b54f  # frozen: 3.8.0
     hooks:
       - id: editorconfig-checker
         name: EditorConfig Checker
         description: Check for compliance with the definitions in the EditorConfig file.
 
   - repo: https://github.com/adamchainz/django-upgrade
-    rev: 553731fe59437e0bd2cf18b10144116422bed259  # frozen: 1.29.1
+    rev: bdcc9646c249f00ec9781751791e7b75b48b3722  # frozen: 1.31.1
     hooks:
       - id: django-upgrade
         name: Django upgrade
@@ -214,7 +214,7 @@ repos:
         description: Check for extraneous `# noqa` comments.
 
   - repo: https://github.com/PyCQA/isort
-    rev: 0a09c783808cfe77bb3269250f663ff733d23302  # frozen: 7.0.0
+    rev: 7f321d375f31a2f03833bc9a548e8783f2b5c420  # frozen: 9.0.0b1
     hooks:
       - id: isort
         name: Isort
@@ -228,7 +228,7 @@ repos:
         description: Check for black disable comments.
 
   - repo: https://github.com/psf/black-pre-commit-mirror
-    rev: ea488cebbfd88a5f50b8bd95d5c829d0bb76feb8  # frozen: 26.1.0
+    rev: 4160603246a6b365d4a2af661c6d71b0a0f50478  # frozen: 26.5.1
     hooks:
       - id: black
         name: Black
@@ -260,14 +260,14 @@ repos:
           - mdformat-shfmt==0.2.0  # Mdformat plugin to format shell code blocks » https://github.com/hukkin/mdformat-shfmt/tags
 
   - repo: https://github.com/tox-dev/tox-ini-fmt
-    rev: a55736a49694e73b4b885c78a827d9771515b9dd  # frozen: 1.7.1
+    rev: 69e8f0ead1b1164c731b4a702896e3218feecf0b  # frozen: 1.8.1
     hooks:
       - id: tox-ini-fmt
         name: tox.ini formatter
         description: Format the tox.ini file.
 
   - repo: https://github.com/tox-dev/pyproject-fmt
-    rev: 662a9f8c81ba2eb5222b17c6707193907713a0a1  # frozen: v2.16.0
+    rev: d600c142bb19f521ae6a6a345f94a2efd7937759  # frozen: v2.26.0
     hooks:
       - id: pyproject-fmt
         name: pyproject.toml formatter
@@ -285,7 +285,7 @@ repos:
         description: Validate the pyproject.toml file.
 
   - repo: https://github.com/pylint-dev/pylint
-    rev: e16f942166511d6fb4427e503a734152fae0c4fe  # frozen: v4.0.4
+    rev: 8a396357098337ba8be714fffdf2d00947a9778c  # frozen: v4.0.6
     hooks:
       - id: pylint
         name: Pylint
@@ -294,7 +294,7 @@ repos:
           - --py-version=3.10  # Minimum required Python version for AA. Update as needed.
 
   - repo: https://github.com/python-jsonschema/check-jsonschema
-    rev: ccf21790019848af3eb4464be2a9d5efed6358f3  # frozen: 0.36.1
+    rev: 1a4bb160cab6417b3045e1b37b6b72449243e658  # frozen: 0.37.4
     hooks:
       - id: check-github-actions
         name: Check GitHub Actions
